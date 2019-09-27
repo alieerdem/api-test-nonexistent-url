@@ -5,6 +5,7 @@ public class PageObjects {
 	public static final String API_ROOT = "http://www.noapi.com";
 	public static final String API_PATH = "/api/stamps";
 	
+	//Warning messages
 	public static String warningMsg1 = "Field 'title' and 'owner' are required";
 	public static String warningMsg2 = "Field 'title' is required";
 	public static String warningMsg3 = "Field 'owner' is required";
