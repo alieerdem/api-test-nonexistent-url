@@ -13,5 +13,10 @@ public class PageObjects {
 	public static String warningMsg5 = "Field 'title' cannot be empty";
 	public static String warningMsg6 = "Field 'owner' cannot be empty";
 	public static String warningMsg7 = "Another stamp with similar title and owner already exists.";
+	
+	//default variables to send to PUT request
+	public static int id = 1;
+	public static String owner = "Ali Ertugrul";
+	public static String title = "Lorem Ipsum";
 
 }

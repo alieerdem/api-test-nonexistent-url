@@ -12,15 +12,6 @@ import pageobjectmodel.PageObjects;
 */
 
 public class ApiTest {
-	
-	//default variables to send to PUT request
-	int id = 1;
-	String owner = "Ali Ertugrul";
-	String title = "Lorem Ipsum";
-	
-	//warning message that will change according to scenarios
-	String warningMsg;
-	
 	//define baseURI and basePath in a constructor to get API_ROOT and API_PATH before test methods run.
 	public ApiTest(){
 		baseURI= PageObjects.API_ROOT;
@@ -50,7 +41,7 @@ public class ApiTest {
 		
 		//send put request without title
 		given().
-			pathParam("owner", owner).
+			pathParam("owner", PageObjects.owner).
 		when().
 			put("/{owner}/").
 		then().
@@ -59,7 +50,7 @@ public class ApiTest {
 		
 		//send put request without owner
 		given().
-			pathParam("title", title).
+			pathParam("title", PageObjects.title).
 		when().
 			put("/{title}/").
 		then().
@@ -81,7 +72,7 @@ public class ApiTest {
 		
 		//send title null
 		given().
-			pathParams("owner", owner, "title", null).
+			pathParams("owner", PageObjects.owner, "title", null).
 		when().
 			put("/{owner}/{title}").
 		then().
@@ -90,7 +81,7 @@ public class ApiTest {
 		
 		//send owner null
 		given().
-			pathParams("owner", null, "title", title).
+			pathParams("owner", null, "title", PageObjects.title).
 		when().
 			put("/{owner}/{title}").
 		then().
@@ -102,7 +93,7 @@ public class ApiTest {
 	@Test
 	public void verifyIdReadOnly() {
 		given().
-			pathParam("id", id).
+			pathParam("id", PageObjects.id).
 		when().
 			put("/{id}/").
 		then().
@@ -116,14 +107,14 @@ public class ApiTest {
 		//take id of new stamp from put request's response and use it on get
 		int id =
 		given().
-			pathParams("owner", owner, "title", title).
+			pathParams("owner", PageObjects.owner, "title", PageObjects.title).
 		when().
 			put("/{owner}/{title}/").
 		then().
 			statusCode(200).
 			body("id", equalTo(1)).
-			body("owner", equalTo(owner)).
-			body("title", equalTo(title)).
+			body("owner", equalTo(PageObjects.owner)).
+			body("title", equalTo(PageObjects.title)).
 			extract().response().path("id");
 		
 		//get request using id of created stamp. it should return the same stamp.
@@ -134,10 +125,9 @@ public class ApiTest {
 		then().
 			statusCode(200).
 			body("id", equalTo(id)).
-			body("owner", equalTo(owner)).
-			body("title", equalTo(title));
+			body("owner", equalTo(PageObjects.owner)).
+			body("title", equalTo(PageObjects.title));
 	}
-	
 	
 	//Verify that you cannot create a duplicate stamp.
 	@Test
