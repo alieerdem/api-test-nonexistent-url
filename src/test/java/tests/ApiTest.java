@@ -7,8 +7,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import pageobjectmodel.PageObjects;
 
 /* 
-1.	Assumption: The testing api is reset before each of test case run.
-2.	Defined api url (www.noapi.com) is an imaginery url, so all cases will be failed when you run tests.
+	The testing api is reset before each of test case run.
+	Defined api url (www.noapi.com) is an imaginery url, so all cases will be failed when tests are run.
 */
 
 public class ApiTest {
