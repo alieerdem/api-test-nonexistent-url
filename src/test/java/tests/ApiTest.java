@@ -40,28 +40,62 @@ public class ApiTest {
 	//Verify that title and owner are required fields.
 	@Test
 	public void verifyRequiredFields() {
-		warningMsg = "Field 'title' and 'owner' are required";
-		
+		//send put request without title and owner
 		given().
 		when().
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(warningMsg));
+			body("error", equalTo(PageObjects.warningMsg1));
+		
+		//send put request without title
+		given().
+			pathParam("owner", owner).
+		when().
+			put("/{owner}/").
+		then().
+			statusCode(400).
+			body("error", equalTo(PageObjects.warningMsg2));
+		
+		//send put request without owner
+		given().
+			pathParam("title", title).
+		when().
+			put("/{title}/").
+		then().
+			statusCode(400).
+			body("error", equalTo(PageObjects.warningMsg3));
 	}
 	
 	//Verify that title and owner cannot be empty.
 	@Test
 	public void verifyNonEmptyFields() {
-		warningMsg = "Field 'title' and 'owner' cannot be empty";
-		
+		//send title and owner null
 		given().
-			pathParams("title", null, "owner", null).
+			pathParams("owner", null, "title", null).
 		when().
-			put().
+			put("/{owner}/{title}").
 		then().
 			statusCode(400).
-			body("error", equalTo(warningMsg));
+			body("error", equalTo(PageObjects.warningMsg4));
+		
+		//send title null
+		given().
+			pathParams("owner", owner, "title", null).
+		when().
+			put("/{owner}/{title}").
+		then().
+			statusCode(400).
+			body("error", equalTo(PageObjects.warningMsg5));
+		
+		//send owner null
+		given().
+			pathParams("owner", null, "title", title).
+		when().
+			put("/{owner}/{title}").
+		then().
+			statusCode(400).
+			body("error", equalTo(PageObjects.warningMsg6));
 	}
 	
 	//Verify that the id field is read only.
@@ -79,7 +113,7 @@ public class ApiTest {
 	@Test
 	public void verifyNewStampIsCreatable() {
 		//create stamp and check if created stamp will be returned in the response.
-		//get id of new stamp for get request
+		//take id of new stamp from put request's response and use it on get
 		int id =
 		given().
 			pathParams("owner", owner, "title", title).
@@ -92,7 +126,7 @@ public class ApiTest {
 			body("title", equalTo(title)).
 			extract().response().path("id");
 		
-		//get request using id of created stamp should return the same stamp.
+		//get request using id of created stamp. it should return the same stamp.
 		given().
 			pathParam("id", id).
 		when().
@@ -108,8 +142,6 @@ public class ApiTest {
 	//Verify that you cannot create a duplicate stamp.
 	@Test
 	public void verifyDuplicateStampIsNotPossible() {
-		warningMsg = "Another stamp with similar title and owner already exists.";
-		
 		//create first stamp
 		String owner = "Ali Ertugrul";
 		String title = "Lorem Ipsum";
@@ -121,13 +153,13 @@ public class ApiTest {
 		then().
 			statusCode(200);
 		
-		//Try to create second stamp with same owner and title data, check if you get error message
+		//Try to create second stamp with same owner and title fields and then check error message
 		given().
 			pathParams("owner", owner, "title", title).
 		when().
 			put("/{owner}/{title}/").
 		then().
 			statusCode(400).
-			body("error", equalTo(warningMsg));
+			body("error", equalTo(PageObjects.warningMsg7));
 	}	
 }
