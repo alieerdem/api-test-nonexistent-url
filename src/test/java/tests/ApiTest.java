@@ -3,6 +3,7 @@ package tests;
 import static io.restassured.RestAssured.*;
 import org.testng.annotations.Test;
 import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import pageobjectmodel.PageObjects;
 
@@ -12,6 +13,7 @@ import pageobjectmodel.PageObjects;
 */
 
 public class ApiTest {
+	
 	//define baseURI and basePath in a constructor to get API_ROOT and API_PATH before test methods run.
 	public ApiTest(){
 		baseURI= PageObjects.API_ROOT;
@@ -25,13 +27,14 @@ public class ApiTest {
 		when().
 			get().
 		then().
+			//check if response body is empty
 			body("", Matchers.empty());
 	}
 	
 	//Verify that title and owner are required fields.
 	@Test
-	public void verifyRequiredFields() {
-		//send put request without title and owner
+	public void verifyRequiredFields() {		
+		//send put request without title and owner, don't send request body
 		given().
 		when().
 			put().
@@ -39,20 +42,20 @@ public class ApiTest {
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg1));
 		
-		//send put request without title
+		//send put request without title field in body
 		given().
-			pathParam("owner", PageObjects.owner).
 		when().
-			put("/{owner}/").
+			body(PageObjects.getRequestBodyWithoutFields(PageObjects.title)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg2));
 		
-		//send put request without owner
+		//send put request without owner field in body
 		given().
-			pathParam("title", PageObjects.title).
 		when().
-			put("/{title}/").
+			body(PageObjects.getRequestBodyWithoutFields(PageObjects.owner)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg3));
@@ -63,27 +66,27 @@ public class ApiTest {
 	public void verifyNonEmptyFields() {
 		//send title and owner null
 		given().
-			pathParams("owner", null, "title", null).
 		when().
-			put("/{owner}/{title}").
+			body(PageObjects.getRequestBody(null, null)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg4));
 		
 		//send title null
 		given().
-			pathParams("owner", PageObjects.owner, "title", null).
 		when().
-			put("/{owner}/{title}").
+			body(PageObjects.getRequestBody(PageObjects.owner, null)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg5));
 		
 		//send owner null
 		given().
-			pathParams("owner", null, "title", PageObjects.title).
 		when().
-			put("/{owner}/{title}").
+			body(PageObjects.getRequestBody(null, PageObjects.title)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg6));
@@ -93,35 +96,35 @@ public class ApiTest {
 	@Test
 	public void verifyIdReadOnly() {
 		given().
-			pathParam("id", PageObjects.id).
 		when().
-			put("/{id}/").
+			body(PageObjects.requestBodyWithID).
+			put().
 		then().
 			statusCode(400);
 	}
 	
-	//Verify that you can create a new stamp via PUT.
+	//Verify that you can create a new stamp using PUT request.
 	@Test
 	public void verifyNewStampIsCreatable() {
 		//create stamp and check if created stamp will be returned in the response.
-		//take id of new stamp from put request's response and use it on get
 		int id =
 		given().
-			pathParams("owner", PageObjects.owner, "title", PageObjects.title).
 		when().
-			put("/{owner}/{title}/").
+			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			put().
 		then().
 			statusCode(200).
-			body("id", equalTo(1)).
+			body("id.Size()", greaterThan(0)).
 			body("owner", equalTo(PageObjects.owner)).
 			body("title", equalTo(PageObjects.title)).
+			//take id of new stamp from response to use it on get.
 			extract().response().path("id");
 		
 		//get request using id of created stamp. it should return the same stamp.
 		given().
 			pathParam("id", id).
 		when().
-			get("/{id}/").
+			get("{id}/").
 		then().
 			statusCode(200).
 			body("id", equalTo(id)).
@@ -133,21 +136,18 @@ public class ApiTest {
 	@Test
 	public void verifyDuplicateStampIsNotPossible() {
 		//create first stamp
-		String owner = "Ali Ertugrul";
-		String title = "Lorem Ipsum";
-		
 		given().
-			pathParams("owner", owner, "title", title).
 		when().
-			put("/{owner}/{title}/").
+			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			put().
 		then().
 			statusCode(200);
 		
-		//Try to create second stamp with same owner and title fields and then check error message
+		//Try to create second stamp with same owner and title fields, then check error message
 		given().
-			pathParams("owner", owner, "title", title).
 		when().
-			put("/{owner}/{title}/").
+			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			put().
 		then().
 			statusCode(400).
 			body("error", equalTo(PageObjects.warningMsg7));

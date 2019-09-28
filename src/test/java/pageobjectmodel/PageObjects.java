@@ -3,7 +3,7 @@ package pageobjectmodel;
 public class PageObjects {
 	//api root and path defined as constants because same path is used in all cases.
 	public static final String API_ROOT = "http://www.noapi.com";
-	public static final String API_PATH = "/api/stamps";
+	public static final String API_PATH = "/api/stamps/";
 	
 	//Warning messages
 	public static String warningMsg1 = "Field 'title' and 'owner' are required";
@@ -18,5 +18,28 @@ public class PageObjects {
 	public static int id = 1;
 	public static String owner = "Ali Ertugrul";
 	public static String title = "Lorem Ipsum";
+	
+	//function that will return request body for put requests.
+	public static String getRequestBody(String owner, String title) {
+		String requestBody = "{\"owner\": \"" + owner + "\", \"title\": \"" + title + "\"}";
+		return requestBody;
+	}
+	
+	//function that will return request body without some fields to test required fields on put requests.
+	public static String getRequestBodyWithoutFields(String unnecassaryField) {
+		String requestBody;
+		if(unnecassaryField=="owner") {
+			requestBody = "\"title\": \"" + title + "\"}";
+			return requestBody;
+		}
+		
+		else {
+			requestBody = "\"owner\": \"" + owner + "\"}";
+			return requestBody;
+		}			
+	}
+	
+	
+	public static String requestBodyWithID = "{\"id\":" + PageObjects.id + ",\"owner\": \"" + owner + "\", \"title\": \"" + title + "\"}";
 
 }
