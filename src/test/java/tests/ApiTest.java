@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.CoreMatchers.equalTo;
-import pageobjectmodel.PageObjects;
+import pageobjectmodel.StaticVariables;
 
 /* 
 	The testing api is reset before each of test case run.
@@ -16,8 +16,8 @@ public class ApiTest {
 	
 	//define baseURI and basePath in a constructor to get API_ROOT and API_PATH before test methods run.
 	public ApiTest(){
-		baseURI= PageObjects.API_ROOT;
-		basePath = PageObjects.API_PATH;
+		baseURI= StaticVariables.API_ROOT;
+		basePath = StaticVariables.API_PATH;
 	}
 	
 	//Verify that the api starts with an empty store.
@@ -40,25 +40,25 @@ public class ApiTest {
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg1));
+			body("error", equalTo(StaticVariables.warningMsg1));
 		
 		//send put request without title field in body
 		given().
 		when().
-			body(PageObjects.getRequestBodyWithoutFields(PageObjects.title)).
+			body(StaticVariables.getRequestBodyWithoutFields(StaticVariables.title)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg2));
+			body("error", equalTo(StaticVariables.warningMsg2));
 		
 		//send put request without owner field in body
 		given().
 		when().
-			body(PageObjects.getRequestBodyWithoutFields(PageObjects.owner)).
+			body(StaticVariables.getRequestBodyWithoutFields(StaticVariables.owner)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg3));
+			body("error", equalTo(StaticVariables.warningMsg3));
 	}
 	
 	//Verify that title and owner cannot be empty.
@@ -67,29 +67,29 @@ public class ApiTest {
 		//send title and owner null
 		given().
 		when().
-			body(PageObjects.getRequestBody(null, null)).
+			body(StaticVariables.getRequestBody(null, null)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg4));
+			body("error", equalTo(StaticVariables.warningMsg4));
 		
 		//send title null
 		given().
 		when().
-			body(PageObjects.getRequestBody(PageObjects.owner, null)).
+			body(StaticVariables.getRequestBody(StaticVariables.owner, null)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg5));
+			body("error", equalTo(StaticVariables.warningMsg5));
 		
 		//send owner null
 		given().
 		when().
-			body(PageObjects.getRequestBody(null, PageObjects.title)).
+			body(StaticVariables.getRequestBody(null, StaticVariables.title)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg6));
+			body("error", equalTo(StaticVariables.warningMsg6));
 	}
 	
 	//Verify that the id field is read only.
@@ -97,7 +97,7 @@ public class ApiTest {
 	public void verifyIdReadOnly() {
 		given().
 		when().
-			body(PageObjects.requestBodyWithID).
+			body(StaticVariables.requestBodyWithID).
 			put().
 		then().
 			statusCode(400);
@@ -110,13 +110,13 @@ public class ApiTest {
 		int id =
 		given().
 		when().
-			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			body(StaticVariables.getRequestBody(StaticVariables.owner, StaticVariables.title)).
 			put().
 		then().
 			statusCode(200).
 			body("id.Size()", greaterThan(0)).
-			body("owner", equalTo(PageObjects.owner)).
-			body("title", equalTo(PageObjects.title)).
+			body("owner", equalTo(StaticVariables.owner)).
+			body("title", equalTo(StaticVariables.title)).
 			//take id of new stamp from response to use it on get.
 			extract().response().path("id");
 		
@@ -128,8 +128,8 @@ public class ApiTest {
 		then().
 			statusCode(200).
 			body("id", equalTo(id)).
-			body("owner", equalTo(PageObjects.owner)).
-			body("title", equalTo(PageObjects.title));
+			body("owner", equalTo(StaticVariables.owner)).
+			body("title", equalTo(StaticVariables.title));
 	}
 	
 	//Verify that you cannot create a duplicate stamp.
@@ -138,7 +138,7 @@ public class ApiTest {
 		//create first stamp
 		given().
 		when().
-			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			body(StaticVariables.getRequestBody(StaticVariables.owner, StaticVariables.title)).
 			put().
 		then().
 			statusCode(200);
@@ -146,10 +146,10 @@ public class ApiTest {
 		//Try to create second stamp with same owner and title fields, then check error message
 		given().
 		when().
-			body(PageObjects.getRequestBody(PageObjects.owner, PageObjects.title)).
+			body(StaticVariables.getRequestBody(StaticVariables.owner, StaticVariables.title)).
 			put().
 		then().
 			statusCode(400).
-			body("error", equalTo(PageObjects.warningMsg7));
+			body("error", equalTo(StaticVariables.warningMsg7));
 	}	
 }
